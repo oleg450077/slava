@@ -1,7 +1,7 @@
-name: Admin
-street: "4970 El Camino Real"
-zip: "94022"a asdf asdf
-city: Los Altos
-state: California
-email: admin@example.com
+name: Administrator
+address: 4970 El Camino Real
+zip: "94022"
+email: mail@example.com
 phone: "1234567890"
+city: LOS ALTOS
+state: CA
