@@ -5,6 +5,7 @@ import cucumber.api.java.en.Then;
 import cucumber.api.java.en.When;
 import pages.QuoteForm;
 import pages.QuoteResult;
+import pages.UspsHome;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -14,6 +15,9 @@ public class MarketStepDefs {
         switch (page) {
             case "quote":
                 new QuoteForm().open();
+                break;
+            case "usps":
+                new UspsHome().open();
                 break;
             default:
                 throw new RuntimeException("Unknown page: " + page);

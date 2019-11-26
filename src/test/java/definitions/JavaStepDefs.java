@@ -198,7 +198,30 @@ public class JavaStepDefs {
         System.out.println(isPrimeSimple(17));
         // Find if number is Prime
         System.out.println(isPrime(17));
+
+        // Binary search
+        int[] sortedArr = {1, 3, 6, 8, 11, 17, 32, 44, 85, 92};
+        System.out.println(binarySearch(sortedArr, 2));
+        System.out.println(binarySearch(sortedArr, 44));
     }
+
+    boolean binarySearch(int[] arr, int num) {
+        int low = 0;
+        int high = arr.length - 1;
+        while (low <= high) {
+            int mid = (low + high) / 2;
+            if (arr[mid] == num) {
+                return true;
+            } else if (arr[mid] < num) {
+                low = mid + 1;
+            } else {
+                high = mid - 1;
+            }
+        }
+
+        return false;
+    }
+
 
     void print2MaxNumbers(int[] arr) {
         int max = Integer.MIN_VALUE;
