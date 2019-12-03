@@ -1,5 +1,6 @@
 package pages;
 
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.PageFactory;
 
@@ -20,5 +21,9 @@ public class Page {
 
     protected void clickWithJS(WebElement element) {
         getExecutor().executeScript("arguments[0].click();", element);
+    }
+
+    protected WebElement byId(String id) {
+        return getDriver().findElement(By.id(id));
     }
 }
