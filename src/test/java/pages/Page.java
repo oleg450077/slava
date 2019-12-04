@@ -1,10 +1,11 @@
 package pages;
 
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.PageFactory;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 
-import static support.TestContext.getDriver;
-import static support.TestContext.getExecutor;
+import static support.TestContext.*;
 
 public class Page {
 
@@ -18,7 +19,20 @@ public class Page {
         getDriver().get(url);
     }
 
+    protected WebElement byXpath(String xpath) {
+        return getDriver().findElement(By.xpath(xpath));
+    }
+
     protected void clickWithJS(WebElement element) {
         getExecutor().executeScript("arguments[0].click();", element);
     }
+
+    protected void mouseOver(WebElement element) {
+        getActions().moveToElement(element).perform();
+    }
+
+    protected void waitForClickable(WebElement element) {
+        getWait().until(ExpectedConditions.elementToBeClickable(element));
+    }
+
 }

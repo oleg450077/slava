@@ -12,3 +12,10 @@
         | stamps | Tiffany Lamp  |
         | boxes  | Priority Mail |
 
+    @usps2
+    Scenario: Click-N-Ship
+      Given I navigate to "usps" page
+      When I go to "Click-N-Ship" under "Mail & Ship" menu
+      Then I verify that "Sign In" is required
+      Then I verify that "Sign Up Now" is possible
+

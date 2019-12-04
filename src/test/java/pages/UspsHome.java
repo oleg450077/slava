@@ -15,6 +15,14 @@ public class UspsHome extends Page {
     @FindBy(xpath = "//div[contains(@class,'premium')]//a[@data-gtm-label='order-now']")
     private WebElement boxes;
 
+    public void mouseOverMenu(String name) {
+        mouseOver(byXpath("//a[text()='" + name + "']"));
+    }
+
+    public void clickMenuItem(String name) {
+        byXpath("//li/a[text()='" + name + "']").click();
+    }
+
     public void clickStamps() {
         stamps.click();
     }
