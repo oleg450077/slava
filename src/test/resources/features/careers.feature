@@ -12,7 +12,15 @@ Feature: Careers scenarios
   @careers2
   Scenario: Careers candidate scenario
     Given I navigate to "careers" page
-    And I apply to "automation" position
-    Then I verify profile is created
-    And I see "automation" position in my jobs
+    And I apply to "automation" position as "sdet"
+    Then I verify new profile is created
+    And I see "automation" position in my jobs
 
+  @careers3
+  Scenario: Careers adds new job
+    Given I open "careers" page
+    And I login as "sdet"
+    Then I verify "sdet" login
+    When I apply for a new job
+    Then I see position marked as applied
+    And I see position in my jobs
