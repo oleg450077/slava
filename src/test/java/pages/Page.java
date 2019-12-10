@@ -27,6 +27,10 @@ public class Page {
         getExecutor().executeScript("arguments[0].click();", element);
     }
 
+    protected WebElement byId(String id) {
+        return getDriver().findElement(By.id(id));
+    }
+
     protected void mouseOver(WebElement element) {
         getActions().moveToElement(element).perform();
     }
