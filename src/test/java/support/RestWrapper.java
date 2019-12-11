@@ -20,11 +20,12 @@ public class RestWrapper {
         RequestSpecification request = RestAssured
                 .given()
                 .log().all()
+                .baseUri(baseUrl)
                 .header(CONTENT_TYPE, JSON)
                 .body(credentials);
 
         // execute
-        Response response = request.post(baseUrl + "login");
+        Response response = request.post("login");
 
         // verify and extract
         Map<String, Object> result = response
