@@ -25,7 +25,9 @@ public class RestWrapper {
                 .body(credentials);
 
         // execute
-        Response response = request.post("login");
+        Response response = request
+                .when()
+                .post("login");
 
         // verify and extract
         Map<String, Object> result = response
