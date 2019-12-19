@@ -5,6 +5,8 @@ import cucumber.api.java.en.Then;
 import cucumber.api.java.en.When;
 import support.RestWrapper;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -44,5 +46,50 @@ public class RestStepDefs {
             }
         }
         assertThat(isFound).isTrue();
+    }
+
+    @When("I update via REST {string} position")
+    public void iUpdateViaRESTPosition(String type) {
+        Map<String, String> newFields = getData(type + "_updated");
+        Object id = RestWrapper.getLastPosition().get("id");
+        new RestWrapper().updatePosition(newFields, id);
+    }
+
+    @Then("I verify via REST new position is updated")
+    public void iVerifyViaRESTNewPositionIsUpdated() {
+        Map<String, Object> expectedPosition = RestWrapper.getLastPosition();
+        Map<String, Object> actualPosition = new RestWrapper().getPositionById(expectedPosition.get("id"));
+
+        for(String key : expectedPosition.keySet()) {
+            assertThat(actualPosition.get(key)).isEqualTo(expectedPosition.get(key));
+        }
+    }
+
+    @When("I delete via REST new position")
+    public void iDeleteViaRESTNewPosition() {
+        new RestWrapper().deletePositionById(RestWrapper.getLastPosition().get("id"));
+    }
+
+    @Then("I verify via REST new position is deleted")
+    public void iVerifyViaRESTNewPositionIsDeleted() {
+        List<Map<String, Object>> positions = new RestWrapper().getPositions();
+        Map<String, Object> deletedPosition = RestWrapper.getLastPosition();
+        for(Map<String, Object> position : positions) {
+            if (position.get("id").equals(deletedPosition.get("id"))) {
+                throw new RuntimeException("Position is still in the list! Id: " + deletedPosition.get("id"));
+            }
+        }
+    }
+
+    @When("I create via REST {string} candidate")
+    public void iCreateViaRESTCandidate(String arg0) {
+
+        // Example of handling email
+        String email = "john@example.com";
+        String name = email.split("@")[0];
+        String domain = email.split("@")[1];
+        String timestamp = new SimpleDateFormat("yyyy-MM-dd-HH-mm-sss").format(new Date());
+        String finalEmail = name + "+" + timestamp + "@" + domain;
+        System.out.println(finalEmail);
     }
 }

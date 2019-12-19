@@ -1,6 +1,7 @@
 package support;
 
 import io.restassured.RestAssured;
+import io.restassured.path.json.JsonPath;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
 
@@ -9,11 +10,14 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 public class RestWrapper {
 
     private String baseUrl = "https://skryabin.com/recruit/api/v1/";
     private static String loginToken;
     private static Map<String, Object> lastPosition;
+    private static JsonPath metadata;
 
     public static final String CONTENT_TYPE = "Content-Type";
     public static final String JSON = "application/json";
@@ -48,7 +52,7 @@ public class RestWrapper {
                 .getMap("");
 
         loginToken = "Bearer " + result.get("token");
-
+        initMetadata();
     }
 
     public Map<String, Object> createPosition(Map<String, String> position) {
@@ -85,7 +89,7 @@ public class RestWrapper {
                 .getMap("");
 
         lastPosition = result;
-
+        assertMetadata(result, "positions");
         return result;
     }
 
@@ -110,6 +114,93 @@ public class RestWrapper {
                 .jsonPath()
                 .getList("");
 
+        for (Map<String, Object> item : result) {
+            assertMetadata(item, "positions");
+        }
         return result;
     }
+
+    public Map<String, Object> updatePosition(Map<String, String> fields, Object id) {
+        Map<String, Object> result = RestAssured
+                .given()
+                .log().all()
+                .baseUri(baseUrl)
+                .header(CONTENT_TYPE, JSON)
+                .header(AUTH, loginToken)
+                .body(fields)
+                .when()
+                .put("positions/" + id)
+                .then()
+                .log().all()
+                .statusCode(200)
+                .extract()
+                .jsonPath()
+                .getMap("");
+
+        for(String key : result.keySet()) {
+            lastPosition.put(key, result.get(key));
+        }
+        assertMetadata(result, "positions");
+        return result;
+    }
+
+    public Map<String, Object> getPositionById(Object id) {
+        Map<String, Object> result = RestAssured
+                .given()
+                .baseUri(baseUrl)
+                .log().all()
+                .when()
+                .get("positions/" + id)
+                .then()
+                .log().all()
+                .statusCode(200)
+                .extract()
+                .jsonPath()
+                .getMap("");
+
+        assertMetadata(result, "positions");
+        return result;
+    }
+
+    public void deletePositionById(Object id) {
+        RestAssured
+                .given()
+                .baseUri(baseUrl)
+                .log().all()
+                .when()
+                .header(AUTH, loginToken)
+                .when()
+                .delete("positions/" + id)
+                .then()
+                .statusCode(204);
+    }
+
+    private void initMetadata() {
+        JsonPath result = RestAssured
+                .given()
+                .baseUri(baseUrl)
+                .log().all()
+                .when()
+                .get("swagger.json")
+                .then()
+                .log().headers()
+                .statusCode(200)
+                .extract()
+                .jsonPath();
+
+        metadata = result;
+    }
+
+    private static void assertMetadata(Map<String, Object> actual, String type) {
+        for (String key : actual.keySet()) {
+            if (actual.get(key) != null) {
+                String actualType = actual.get(key).getClass().toString();
+                actualType = actualType.substring(actualType.lastIndexOf(".") + 1);
+                String expectedType = metadata.getString("definitions." + type + ".properties." + key + ".type");
+                assertThat(actualType).isEqualToIgnoringCase(expectedType);
+            }
+        }
+    }
+
+
 }
