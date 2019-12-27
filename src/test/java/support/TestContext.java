@@ -17,11 +17,11 @@ import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.yaml.snakeyaml.Yaml;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
+import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -33,12 +33,34 @@ public class TestContext {
         return driver;
     }
 
-    public static Map<String, String> getData(String fileName) {
-        String path = System.getProperty("user.dir") + "/src/test/resources/data/" + fileName + ".yml";
-        File file = new File(path);
+    public static File getFile(String fileName, String extension) {
+        String path = System.getProperty("user.dir") + "/src/test/resources/data/" + fileName + "." + extension;
+        return new File(path);
+    }
+
+    public static void saveData(String fileName, String extension, byte[] bytes) {
+        try(FileOutputStream stream = new FileOutputStream(getFile(fileName, extension))) {
+            stream.write(bytes);
+            stream.flush();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static YamlMap getConfig() {
         FileInputStream stream = null;
         try {
-            stream = new FileInputStream(file);
+            stream = new FileInputStream(getFile("config", "yml"));
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        return new YamlMap(new Yaml().load(stream));
+    }
+
+    public static Map<String, String> getData(String fileName) {
+        FileInputStream stream = null;
+        try {
+            stream = new FileInputStream(getFile(fileName, "yml"));
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
@@ -49,12 +71,23 @@ public class TestContext {
         return getData("customer");
     }
 
+    public static String addTimeStampToEmail(String email) {
+        String name = email.split("@")[0];
+        String domain = email.split("@")[1];
+        String timestamp = new SimpleDateFormat("yyyy-MM-dd-HH-mm-sss").format(new Date());
+        return name + "+" + timestamp + "@" + domain;
+    }
+
     public static JavascriptExecutor getExecutor() {
         return (JavascriptExecutor) driver;
     }
 
     public static WebDriverWait getWait() {
-        return getWait(5);
+        return getWait(getConfig().getInt("explicitTimeout"));
+    }
+
+    public static WebDriverWait getLongWait() {
+        return getWait(getConfig().getInt("explicitLongTimeout"));
     }
 
     public static WebDriverWait getWait(int timeout) {
@@ -66,7 +99,7 @@ public class TestContext {
     }
 
     public static void initialize() {
-        initialize("chrome", false);
+        initialize(getConfig().getString("browser"), getConfig().getBoolean("isHeadless"));
     }
 
     public static void teardown() {

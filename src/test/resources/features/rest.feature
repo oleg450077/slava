@@ -16,6 +16,7 @@
       Given I login via REST as "recruiter"
       When I create via REST "sdet" candidate
       And I add via REST "pdf" resume to a new candidate
+      Then I verify via REST that "pdf" resume has been added
       Then I verify via REST new candidate is in the list
       When I update via REST "sdet" candidate
       Then I verify via REST new candidate is updated

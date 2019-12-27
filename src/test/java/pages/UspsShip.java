@@ -1,10 +1,8 @@
 package pages;
 
+import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
-import org.openqa.selenium.support.ui.ExpectedConditions;
-
-import static support.TestContext.getWait;
 
 public class UspsShip extends Page {
 
@@ -25,8 +23,12 @@ public class UspsShip extends Page {
     }
 
     public boolean isSignInErrorsDisplayed() {
-        waitForClickable(signIn);
-        return errorUsername.isDisplayed() && errorPassword.isDisplayed();
+        try {
+            waitForVisible(errorUsername);
+            return errorPassword.isDisplayed();
+        } catch (TimeoutException e) {
+            return false;
+        }
     }
 
     public boolean isSignUpPossible() {

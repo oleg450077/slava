@@ -2,9 +2,11 @@ package support;
 
 import io.restassured.RestAssured;
 import io.restassured.path.json.JsonPath;
+import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
 
+import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -17,6 +19,7 @@ public class RestWrapper {
     private String baseUrl = "https://skryabin.com/recruit/api/v1/";
     private static String loginToken;
     private static Map<String, Object> lastPosition;
+    private static Map<String, Object> lastCandidate;
     private static JsonPath metadata;
 
     public static final String CONTENT_TYPE = "Content-Type";
@@ -25,6 +28,10 @@ public class RestWrapper {
 
     public static Map<String, Object> getLastPosition() {
         return lastPosition;
+    }
+
+    public static Map<String, Object> getLastCandidate() {
+        return lastCandidate;
     }
 
     public void login(Map<String, String> credentials) {
@@ -173,6 +180,59 @@ public class RestWrapper {
                 .delete("positions/" + id)
                 .then()
                 .statusCode(204);
+    }
+
+
+    public Map<String, Object> createCandidate(Map<String, String> candidate) {
+
+        candidate.put("email", TestContext.addTimeStampToEmail(candidate.get("email")));
+
+        Map<String, Object> result = RestAssured
+                .given()
+                .log().all()
+                .baseUri(baseUrl)
+                .header(CONTENT_TYPE, JSON)
+                .header(AUTH, loginToken)
+                .body(candidate)
+                .when()
+                .post("candidates")
+                .then()
+                .log().all()
+                .statusCode(201)
+                .extract()
+                .jsonPath()
+                .getMap("");
+
+        lastCandidate = result;
+        assertMetadata(result, "candidates");
+        return result;
+    }
+
+    public void addResume(File resume, Object candidateId) {
+        RestAssured
+                .given()
+                .log().all()
+                .baseUri(baseUrl)
+                .header(AUTH, loginToken)
+                .multiPart("resume", resume)
+                .when()
+                .post("candidates/" + candidateId + "/resume")
+                .then()
+                .log().all()
+                .statusCode(201);
+    }
+
+    public ExtractableResponse<Response> getResume(Object candidateId) {
+        return RestAssured
+                .given()
+                .log().all()
+                .baseUri(baseUrl)
+                .header(AUTH, loginToken)
+                .when()
+                .get("candidates/" + candidateId + "/resume")
+                .then()
+                .log().headers()
+                .extract();
     }
 
     private void initMetadata() {

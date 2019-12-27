@@ -39,4 +39,8 @@ public class Page {
         getWait().until(ExpectedConditions.elementToBeClickable(element));
     }
 
+    protected void waitForVisible(WebElement element) {
+        getWait().until(ExpectedConditions.visibilityOf(element));
+    }
+
 }

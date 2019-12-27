@@ -18,6 +18,7 @@ public class UspsStepDefs {
                 new UspsStore().selectStampsCategory();
             break;
             case "boxes":
+                new UspsHome().mouseOverQuickTools();
                 new UspsHome().clickBoxes();
                 break;
             default:

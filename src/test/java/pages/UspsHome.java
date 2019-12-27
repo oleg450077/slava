@@ -12,8 +12,15 @@ public class UspsHome extends Page {
     @FindBy(xpath = "//a[@data-gtm-section='quicktools'][text()='Stamps & Supplies']")
     private WebElement stamps;
 
-    @FindBy(xpath = "//div[contains(@class,'premium')]//a[@data-gtm-label='order-now']")
+    @FindBy(xpath = "//li[contains(@class,'qt-nav')]/a[@role='menuitem']")
+    private WebElement quickTools;
+
+    @FindBy(xpath = "//li[not(@class)]//a[contains(@href,'shipping-supplies')]")
     private WebElement boxes;
+
+    public void mouseOverQuickTools() {
+        mouseOver(quickTools);
+    }
 
     public void mouseOverMenu(String name) {
         mouseOver(byXpath("//a[text()='" + name + "']"));

@@ -1,17 +1,22 @@
 package definitions;
 
+import cucumber.api.java.en.And;
 import cucumber.api.java.en.Given;
 import cucumber.api.java.en.Then;
 import cucumber.api.java.en.When;
+import io.restassured.response.ExtractableResponse;
+import io.restassured.response.Response;
+import org.apache.commons.codec.binary.Hex;
+import org.apache.commons.io.FileUtils;
 import support.RestWrapper;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.io.File;
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static support.TestContext.getData;
+import static support.TestContext.*;
 
 public class RestStepDefs {
 
@@ -82,14 +87,33 @@ public class RestStepDefs {
     }
 
     @When("I create via REST {string} candidate")
-    public void iCreateViaRESTCandidate(String arg0) {
+    public void iCreateViaRESTCandidate(String type) {
+        new RestWrapper().createCandidate(getData(type));
+    }
 
-        // Example of handling email
-        String email = "john@example.com";
-        String name = email.split("@")[0];
-        String domain = email.split("@")[1];
-        String timestamp = new SimpleDateFormat("yyyy-MM-dd-HH-mm-sss").format(new Date());
-        String finalEmail = name + "+" + timestamp + "@" + domain;
-        System.out.println(finalEmail);
+    @And("I add via REST {string} resume to a new candidate")
+    public void iAddViaRESTResumeToANewCandidate(String fileType) {
+        File resume = getFile("resume", fileType);
+        new RestWrapper().addResume(resume, RestWrapper.getLastCandidate().get("id"));
+    }
+
+    @Then("I verify via REST that {string} resume has been added")
+    public void iVerifyViaRESTThatResumeHasBeenAdded(String fileType) {
+        ExtractableResponse<Response> response = new RestWrapper()
+                        .getResume(RestWrapper.getLastCandidate().get("id"));
+        assertThat(response.header("Content-Disposition")).isEqualTo("attachment; filename=resume." + fileType);
+        byte[] resumeByteArray = response.asByteArray();
+        String hexSignature = Hex.encodeHexString(resumeByteArray);
+        assertThat(hexSignature).startsWith("255044462d"); // PDF signature, refer to https://en.wikipedia.org/wiki/List_of_file_signatures
+        saveData("returnedResume", fileType, resumeByteArray);
+        File actualFile = getFile("resume", "pdf");
+        File expectedFile = getFile("returnedResume", "pdf");
+        boolean areEqual = false;
+        try {
+            areEqual = FileUtils.contentEquals(actualFile, expectedFile);
+        } catch (IOException e) {
+            System.out.println("Issue accessing the files: " + e);
+        }
+        assertThat(areEqual).isTrue();
     }
 }
