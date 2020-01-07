@@ -3,6 +3,7 @@ package definitions;
 import cucumber.api.java.en.Given;
 import cucumber.api.java.en.Then;
 import cucumber.api.java.en.When;
+import pages.CareersLanding;
 import pages.QuoteForm;
 import pages.QuoteResult;
 import pages.UspsHome;
@@ -18,6 +19,9 @@ public class MarketStepDefs {
                 break;
             case "usps":
                 new UspsHome().open();
+                break;
+            case "careers":
+                new CareersLanding().open();
                 break;
             default:
                 throw new RuntimeException("Unknown page: " + page);

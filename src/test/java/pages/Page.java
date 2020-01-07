@@ -1,6 +1,7 @@
 package pages;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.PageFactory;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -21,6 +22,15 @@ public class Page {
 
     protected WebElement byXpath(String xpath) {
         return getDriver().findElement(By.xpath(xpath));
+    }
+
+    public void click(WebElement element) {
+        waitForClickable(element);
+        try {
+            element.click();
+        } catch (WebDriverException e) {
+            clickWithJS(element);
+        }
     }
 
     protected void clickWithJS(WebElement element) {

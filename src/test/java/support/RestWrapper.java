@@ -34,7 +34,7 @@ public class RestWrapper {
         return lastCandidate;
     }
 
-    public void login(Map<String, String> credentials) {
+    public RestWrapper login(Map<String, String> credentials) {
 
         // prepare
         RequestSpecification request = RestAssured
@@ -60,6 +60,7 @@ public class RestWrapper {
 
         loginToken = "Bearer " + result.get("token");
         initMetadata();
+        return new RestWrapper();
     }
 
     public Map<String, Object> createPosition(Map<String, String> position) {

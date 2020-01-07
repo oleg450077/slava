@@ -1,7 +1,7 @@
 @careers
 Feature: Careers scenarios
 
-  @careers1
+  @careers1 @clean_position
   Scenario: Recruiter creates position
     Given I navigate to "careers" page
     And I login as "recruiter"
@@ -9,7 +9,7 @@ Feature: Careers scenarios
     When I create new "automation" position
     And I verify "automation" position created
 
-  @careers2
+  @careers2 @create_position @clean_position
   Scenario: Careers candidate scenario
     Given I navigate to "careers" page
     And I apply to "automation" position as "sdet"

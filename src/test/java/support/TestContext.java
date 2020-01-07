@@ -29,6 +29,20 @@ public class TestContext {
 
     private static WebDriver driver;
 
+    private static Map<String, Object> testData = new HashMap<>();
+
+    public static void setTestData(String key, Object value) {
+        testData.put(key, value);
+    }
+
+    public static String getStringTestData(String key) {
+        return (String) testData.get(key);
+    }
+
+    public static Integer getIntegerTestData(String key) {
+        return (Integer) testData.get(key);
+    }
+
     public static WebDriver getDriver() {
         return driver;
     }
@@ -76,6 +90,11 @@ public class TestContext {
         String domain = email.split("@")[1];
         String timestamp = new SimpleDateFormat("yyyy-MM-dd-HH-mm-sss").format(new Date());
         return name + "+" + timestamp + "@" + domain;
+    }
+
+    public static String addTimeStampToField(String field) {
+        String timestamp = new SimpleDateFormat("yyyy-MM-dd-HH-mm-sss").format(new Date());
+        return field + "-" + timestamp;
     }
 
     public static JavascriptExecutor getExecutor() {

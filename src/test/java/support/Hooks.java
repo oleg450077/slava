@@ -8,8 +8,7 @@ import org.openqa.selenium.TakesScreenshot;
 
 import java.util.concurrent.TimeUnit;
 
-import static support.TestContext.getConfig;
-import static support.TestContext.getDriver;
+import static support.TestContext.*;
 
 public class Hooks {
 
@@ -29,5 +28,15 @@ public class Hooks {
             scenario.embed(screenshot, "image/png");
         }
         TestContext.teardown();
+    }
+
+    @After(value = "@clean_position")
+    public void clearPosition(Scenario scenario) {
+        Integer positionId = getIntegerTestData("lastPositionId");
+        if (positionId != null) {
+            new RestWrapper()
+                    .login(getData("recruiter"))
+                    .deletePositionById(positionId);
+        }
     }
 }
