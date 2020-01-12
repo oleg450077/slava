@@ -2,11 +2,23 @@ package pages;
 
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
+import support.TestContext;
+
+import static support.TestContext.getConfig;
 
 public class QuoteForm extends Page {
 
     public QuoteForm() {
-        url = "https://skryabin.com/market/quote.html";
+        switch (TestContext.getConfig().getString("env")) {
+            case "qa":
+                url = "http://quote-qa.portnov.com/";
+                break;
+            case "staging":
+                url = "http://quote-stage.portnov.com/";
+                break;
+            default:
+                url = "https://skryabin.com/market/quote.html";
+        }
     }
 
     @FindBy(name = "username")

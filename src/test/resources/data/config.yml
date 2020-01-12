@@ -1,4 +1,8 @@
+infrastructure: local
+hubUrl: localhost
+env: qa
 browser: chrome
+browserVersion: 79.0
 isHeadless: false
 implicitTimeout: 10
 pageLoadTimeout: 60

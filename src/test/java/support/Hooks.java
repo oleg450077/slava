@@ -18,6 +18,7 @@ public class Hooks {
         getDriver().manage().deleteAllCookies();
         getDriver().manage().timeouts().pageLoadTimeout(getConfig().getInt("pageLoadTimeout"), TimeUnit.SECONDS);
         getDriver().manage().timeouts().implicitlyWait(getConfig().getInt("implicitTimeout"), TimeUnit.SECONDS);
+        getDriver().manage().window().maximize();
     }
 
     @After(order = 0)
