@@ -8,6 +8,7 @@ import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.io.FileUtils;
+import org.assertj.core.api.Assertions;
 import support.RestWrapper;
 
 import java.io.File;
@@ -115,5 +116,55 @@ public class RestStepDefs {
             System.out.println("Issue accessing the files: " + e);
         }
         assertThat(areEqual).isTrue();
+    }
+
+    @Then("I verify via REST new candidate is in the list")
+    public void iVerifyViaRESTNewCandidateIsInTheList() {
+        new RestWrapper().verifyCandidateInList();
+    }
+
+    @When("I update via REST {string} candidate")
+    public void iUpdateViaRESTCandidate(String type) {
+        Map<String, String> newFields = getData(type + "_updated");
+        Object id = RestWrapper.getLastCandidate().get("id");
+        new RestWrapper().updateCandidate(newFields, id);
+    }
+
+    @Then("I verify via REST new candidate is updated")
+    public void iVerifyViaRESTNewCandidateIsUpdated() {
+        Map<String, Object> expectedCandidate = RestWrapper.getLastCandidate();
+        Map<String, Object> actualCandidate = new RestWrapper().getCandidateById(expectedCandidate.get("id"));
+
+        assertThat(actualCandidate.get("id")).isEqualTo(expectedCandidate.get("id"));
+        assertThat(actualCandidate.get("summary")).isEqualTo(expectedCandidate.get("summary"));
+        assertThat(actualCandidate.get("address")).isEqualTo(expectedCandidate.get("address"));
+        assertThat(actualCandidate.get("city")).isEqualTo(expectedCandidate.get("city"));
+        assertThat(actualCandidate.get("state")).isEqualTo(expectedCandidate.get("state"));
+        assertThat(actualCandidate.get("zip")).isEqualTo(expectedCandidate.get("zip"));
+
+    }
+
+    @When("I delete via REST new candidate")
+    public void iDeleteViaRESTNewCandidate() {
+        new RestWrapper().deleteCandidateById(RestWrapper.getLastCandidate().get("id"));
+    }
+
+    @Then("I verify via REST new candidate is deleted")
+    public void iVerifyViaRESTNewCandidateIsDeleted() {
+        List<Map<String, Object>> candidates = new RestWrapper().getCandidates();
+        Map<String, Object> deletedCandidate = RestWrapper.getLastCandidate();
+        for(Map<String, Object> candidate : candidates) {
+            if (candidate.get("id").equals(deletedCandidate.get("id"))) {
+                throw new RuntimeException("Candidate is still in the list! Id: " + deletedCandidate.get("id"));
+            }
+        }
+
+    }
+
+    @And("I apply via REST new candidate to a new position")
+    public void iApplyViaRESTNewCandidateToANewPosition() {
+
+        new RestWrapper().applyCandidateToPosition(RestWrapper.getLastCandidate().get("id"), RestWrapper.getLastPosition().get("id"));
+
     }
 }

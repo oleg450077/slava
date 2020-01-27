@@ -1,9 +1,11 @@
 package support;
 
 import io.restassured.RestAssured;
+import io.restassured.mapper.ObjectMapper;
 import io.restassured.path.json.JsonPath;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import io.restassured.specification.AuthenticationSpecification;
 import io.restassured.specification.RequestSpecification;
 
 import java.io.File;
@@ -16,7 +18,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class RestWrapper {
 
-    private String baseUrl = "https://skryabin.com/recruit/api/v1/";
+    private static String baseUrl = "https://skryabin.com/recruit/api/v1/";
     private static String loginToken;
     private static Map<String, Object> lastPosition;
     private static Map<String, Object> lastCandidate;
@@ -145,7 +147,7 @@ public class RestWrapper {
                 .jsonPath()
                 .getMap("");
 
-        for(String key : result.keySet()) {
+        for (String key : result.keySet()) {
             lastPosition.put(key, result.get(key));
         }
         assertMetadata(result, "positions");
@@ -263,5 +265,132 @@ public class RestWrapper {
         }
     }
 
+    public List<Map<String, Object>> verifyCandidateInList() {
 
+        // prepare
+        RequestSpecification request = RestAssured
+                .given()
+                .baseUri(baseUrl)
+                .log().all();
+        // execute
+        Response response = request
+                .when()
+                .get("candidates");
+        // verify and extract
+        List<Map<String, Object>> result = response
+                .then()
+                .log().all()
+                .statusCode(200)
+                .extract()
+                .jsonPath()
+                .getList("");
+        assertThat(result.contains(getLastCandidate().get("id")));
+        return result;
+    }
+
+    public Map<String, Object> updateCandidate(Map<String, String> fields, Object id) {
+
+        Map<String, Object> result = RestAssured
+                .given()
+                .log().all()
+                .baseUri(baseUrl)
+                .header(CONTENT_TYPE, JSON)
+                .header(AUTH, loginToken)
+                .body(fields)
+                .when()
+                .patch("candidates/" + id)
+                .then()
+                .log().all()
+                .statusCode(200)
+                .extract()
+                .jsonPath()
+                .getMap("");
+
+
+        for (String key : result.keySet()) {
+            lastCandidate.put(key, result.get(key));
+        }
+        return result;
+    }
+
+    public Map<String, Object> getCandidateById(Object id){
+        Map<String, Object> result = RestAssured
+                .given()
+                .baseUri(baseUrl)
+                .log().all()
+                .when()
+                .get("candidates/" + id)
+                .then()
+                .log().all()
+                .statusCode(200)
+                .extract()
+                .jsonPath()
+                .getMap("");
+
+//        assertMetadata(result, "candidates");
+
+        return result;
+    }
+
+
+    public void deleteCandidateById(Object id) {
+        RestAssured
+                .given()
+                .baseUri(baseUrl)
+                .log().all()
+                .when()
+                .header(AUTH, loginToken)
+                .when()
+                .delete("candidates/" + id)
+                .then()
+                .statusCode(204);
+    }
+
+    public static List<Map<String, Object>> getCandidates() {
+        // prepare
+        RequestSpecification request = RestAssured
+                .given()
+                .baseUri(baseUrl)
+                .log().all();
+
+        // execute
+        Response response = request
+                .when()
+                .get("candidates");
+
+        // verify and extract
+        List<Map<String, Object>> result = response
+                .then()
+                .log().all()
+                .statusCode(200)
+                .extract()
+                .jsonPath()
+                .getList("");
+
+        for (Map<String, Object> item : result) {
+            assertMetadata(item, "candidates");
+        }
+
+        return result;
+
+    }
+
+    public void applyCandidateToPosition(Object candidateId, Object positionId) {
+         RestAssured
+                .given()
+                .log().all()
+                .baseUri(baseUrl)
+                .header(CONTENT_TYPE, JSON)
+                .header(AUTH, loginToken)
+                .body(candidateId)
+                .body(positionId)
+                .when()
+                .post("applications")
+                .then()
+                .log().all()
+                .statusCode(201);
+
+
+
+    }
 }
