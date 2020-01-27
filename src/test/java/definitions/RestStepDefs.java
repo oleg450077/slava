@@ -171,4 +171,18 @@ public class RestStepDefs {
     @And("I apply via REST new candidate to a last position")
     public void iApplyViaRESTNewCandidateToALastPosition() {
     }
+
+    @Then("I verify via REST new application is submitted")
+    public void iVerifyViaRESTNewApplicationIsSubmitted() {
+        
+    }
+
+    @When("I delete via REST new application")
+    public void iDeleteViaRESTNewApplication() {
+        
+    }
+
+    @Then("I verify via REST new application is deleted")
+    public void iVerifyViaRESTNewApplicationIsDeleted() {
+    }
 }
