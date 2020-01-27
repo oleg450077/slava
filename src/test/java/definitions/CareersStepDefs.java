@@ -44,4 +44,8 @@ public class CareersStepDefs {
         setTestData("lastPositionId", new CareersRecruit().getPositionIdByTitle(expectedTitle));
         System.out.println();
     }
+
+    @And("I apply to {string} position as {string}")
+    public void iApplyToPositionAs(String arg0, String arg1) {
+    }
 }
