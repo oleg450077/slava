@@ -167,4 +167,8 @@ public class RestStepDefs {
         new RestWrapper().applyCandidateToPosition(RestWrapper.getLastCandidate().get("id"), RestWrapper.getLastPosition().get("id"));
 
     }
+
+    @And("I apply via REST new candidate to a last position")
+    public void iApplyViaRESTNewCandidateToALastPosition() {
+    }
 }
