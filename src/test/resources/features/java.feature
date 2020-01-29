@@ -1,5 +1,5 @@
 
-#author is Oleg Luks
+#author is Oleg
 
 
 @java
