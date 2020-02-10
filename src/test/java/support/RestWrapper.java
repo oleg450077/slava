@@ -1,11 +1,9 @@
 package support;
 
 import io.restassured.RestAssured;
-import io.restassured.mapper.ObjectMapper;
 import io.restassured.path.json.JsonPath;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import io.restassured.specification.AuthenticationSpecification;
 import io.restassured.specification.RequestSpecification;
 
 import java.io.File;
@@ -20,9 +18,12 @@ public class RestWrapper {
 
     private static String baseUrl = "https://skryabin.com/recruit/api/v1/";
     private static String loginToken;
+    private static Object firstPositionId;
     private static Map<String, Object> lastPosition;
     private static Map<String, Object> lastCandidate;
     private static JsonPath metadata;
+    private static Map<String, Object> firstPosition;
+    private static Map<String,String> credentials;
 
     public static final String CONTENT_TYPE = "Content-Type";
     public static final String JSON = "application/json";
@@ -34,6 +35,10 @@ public class RestWrapper {
 
     public static Map<String, Object> getLastCandidate() {
         return lastCandidate;
+    }
+
+    public static Map<String, String> getCredentials() {
+        return credentials;
     }
 
     public RestWrapper login(Map<String, String> credentials) {
@@ -390,7 +395,75 @@ public class RestWrapper {
                 .log().all()
                 .statusCode(201);
 
+    }
+
+    public void getAllPositions() {
+        RequestSpecification request = RestAssured
+                .given()
+                .log().all()
+                .baseUri(baseUrl);
+
+        Response response = request
+                .when()
+                .get("positions");
+
+        List<Map<String, Object>> result = response
+                .then()
+                .log().all()
+                .statusCode(200)
+                .extract()
+                .jsonPath()
+                .getList("");
+
+        firstPosition= result.get(0);
+        firstPositionId = firstPosition.get("id");
+
+    }
+
+    public void applyCandidateToFirstPosition() {
+
+        RequestSpecification request = RestAssured
+                .given()
+                .log().all()
+                .baseUri(baseUrl);
+
+        Response response = request
+                .when()
+                .get("positions/" + firstPositionId);
+
+        Map <Object, String> result = response
+                .then()
+                .log().all()
+                .statusCode(200)
+                .extract()
+                .jsonPath()
+                .getMap("");
 
 
+    }
+
+    public Map<String, Object> createNewCandidate(Map<String, String> candidate) {
+        candidate.put("email", TestContext.addTimeStampToEmail(candidate.get("email")));
+
+        Map<String, Object> result = RestAssured
+                .given()
+                .log().all()
+                .baseUri(baseUrl)
+                .header(CONTENT_TYPE, JSON)
+                .body(candidate)
+                .when()
+                .post("candidates")
+                .then()
+                .log().all()
+                .statusCode(201)
+                .extract()
+                .jsonPath()
+                .getMap("");
+
+        lastCandidate = result;
+//        assertMetadata(result, "candidates");
+        credentials.put("email", (String) result.get("email"));
+        credentials.put("password", (String) result.get("password"));
+        return result;
     }
 }

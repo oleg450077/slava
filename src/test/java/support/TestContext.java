@@ -85,6 +85,8 @@ public class TestContext {
         return getData("customer");
     }
 
+    public static Map<String, String> getSchedulePickupCustomer (){return getData("step 1.yml");}
+
     public static String addTimeStampToEmail(String email) {
         String name = email.split("@")[0];
         String domain = email.split("@")[1];
