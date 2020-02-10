@@ -161,28 +161,24 @@ public class RestStepDefs {
 
     }
 
-    @And("I apply via REST new candidate to a new position")
-    public void iApplyViaRESTNewCandidateToANewPosition() {
-
-        new RestWrapper().applyCandidateToPosition(RestWrapper.getLastCandidate().get("id"), RestWrapper.getLastPosition().get("id"));
-
+    @Given("I navigate via REST to positions")
+    public void iNavigateViaRESTToPositions() {
+        new RestWrapper().getAllPositions();
     }
 
-    @And("I apply via REST new candidate to a last position")
-    public void iApplyViaRESTNewCandidateToALastPosition() {
+    @And("I apply via REST the first position")
+    public void iApplyViaRESTTheFirstPosition() {
+        new RestWrapper().applyCandidateToFirstPosition();
     }
 
-    @Then("I verify via REST new application is submitted")
-    public void iVerifyViaRESTNewApplicationIsSubmitted() {
-        
+
+    @And("I fill out via REST {string} form and submit")
+    public void iFillOutViaRESTFormAndSubmit(String type) {
+        new RestWrapper().createNewCandidate(getData(type));
+        new RestWrapper().login(RestWrapper.getCredentials());
     }
 
-    @When("I delete via REST new application")
-    public void iDeleteViaRESTNewApplication() {
-        
-    }
-
-    @Then("I verify via REST new application is deleted")
-    public void iVerifyViaRESTNewApplicationIsDeleted() {
+    @Then("I verify via REST login")
+    public void iVerifyViaRESTLogin() {
     }
 }

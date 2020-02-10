@@ -31,11 +31,13 @@ Feature: CRUD operations for Careers
     And I add via REST "pdf" resume to a new candidate
     Then I verify via REST that "pdf" resume has been added
 
-  @rest4
-  Scenario: REST API
-    Given I login via REST as "candidate"
-    And I create via REST "sdet" candidate
-    And I apply via REST new candidate to a last position
-    Then I verify via REST new application is submitted
-    When I delete via REST new application
-    Then I verify via REST new application is deleted
+
+    @rest4
+    Scenario: New Candidate applies for first position with REST
+      Given I navigate via REST to positions
+      And I apply via REST the first position
+      And I fill out via REST "candidate" form and submit
+      Then I verify via REST login
+      Then I verify via REST position in the in my jobs
+      When I delete via REST new application in my jobs
+      Then I verify via REST new application is deleted from my jobs
